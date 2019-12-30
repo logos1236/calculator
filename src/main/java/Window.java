@@ -51,9 +51,9 @@ public class Window implements ActionListener {
             JButton button = new JButton(i+"");
             button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    calculation.setOperand(j);
+                    calculation.setOperand(String.valueOf(j));
 
-                    smallField.setText(Calculation.getFloatStr(calculation.getOperand()));
+                    smallField.setText(calculation.getResultStr());
                 }
             });
 
@@ -75,12 +75,12 @@ public class Window implements ActionListener {
         //=== Запятая
         gridy++;
 
-        JButton button_separator = new JButton(",");
+        JButton button_separator = new JButton(".");
         button_separator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                calculation.setOperand(',');
+                calculation.setOperand(".");
 
-                smallField.setText(Calculation.getFloatStr(calculation.getOperand()));
+                smallField.setText(calculation.getResultStr());
             }
         });
         constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -117,7 +117,7 @@ public class Window implements ActionListener {
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 1;
         constraints.gridwidth = 1;
-        constraints.gridy = 5;
+        constraints.gridy = gridy;
         contents.add(button_minus, constraints);
 
         //=== Результат

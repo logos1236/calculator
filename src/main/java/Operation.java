@@ -1,4 +1,6 @@
 import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Operation {
     private static LinkedList<String> operation_list = new LinkedList<>();
@@ -35,6 +37,25 @@ public class Operation {
         }
         if (operation.equals("-")) {
             result = first_operand - second_operand;
+        }
+
+        return result;
+    }
+
+    public static boolean validateExprecion(String exprecion) {
+        boolean result = true;
+        Matcher matcher = null;
+
+        //=== Проверка точeк
+        matcher = Pattern.compile("(\\.{2})|(\\.(\\d)+\\.)|([^\\d]+\\.)|(^\\.)").matcher(exprecion);
+        if (matcher.find()) {
+            result = false;
+        }
+
+        //=== Проверка операндов
+        matcher = Pattern.compile("([\\+\\-\\*\\/\\^]{2})|(^[\\+\\*\\/\\^])").matcher(exprecion);
+        if (matcher.find()) {
+            result = false;
         }
 
         return result;

@@ -29,22 +29,8 @@ public class Calculation {
 
     public void setOperand(String operand) {
         String tmp_exprecion = this.exprecion + operand;
-        boolean add_operand = true;
-        Matcher matcher = null;
 
-        //=== Проверка точeк
-        matcher = Pattern.compile("(\\.{2})|(\\.(\\d)+\\.)|([^\\d]+\\.)|(^\\.)").matcher(tmp_exprecion);
-        if (matcher.find()) {
-            add_operand = false;
-        }
-
-        //=== Проверка операндов
-        matcher = Pattern.compile("([\\+\\-\\*\\/\\^]{2})|(^[\\+\\*\\/\\^])").matcher(tmp_exprecion);
-        if (matcher.find()) {
-            add_operand = false;
-        }
-
-        if (add_operand) {
+        if (Operation.validateExprecion(tmp_exprecion)) {
             this.exprecion += operand;
         }
     }

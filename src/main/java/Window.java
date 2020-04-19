@@ -53,7 +53,7 @@ public class Window implements ActionListener {
                 public void actionPerformed(ActionEvent e) {
                     calculation.setOperand(String.valueOf(j));
 
-                    smallField.setText(calculation.getResultStr());
+                    smallField.setText(calculation.getExprecion());
                 }
             });
 
@@ -73,21 +73,20 @@ public class Window implements ActionListener {
         }
 
         //=== Запятая
-        gridy++;
-
         JButton button_separator = new JButton(".");
         button_separator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 calculation.setOperand(".");
 
-                smallField.setText(calculation.getResultStr());
+                smallField.setText(calculation.getExprecion());
             }
         });
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 0;
+        constraints.gridx = btn_gridx;
         constraints.gridwidth = 1;
         constraints.gridy = gridy;
         contents.add(button_separator, constraints);
+        btn_gridx++;
 
         //=== Кнопки - операции
         gridy++;
@@ -95,9 +94,9 @@ public class Window implements ActionListener {
         JButton button_plus = new JButton("+");
         button_plus.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                smallField.setText("+");
+                calculation.setOperand("+");
 
-                calculation.setOperation('+');
+                smallField.setText(calculation.getExprecion());
             }
         });
         constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -109,9 +108,9 @@ public class Window implements ActionListener {
         JButton button_minus = new JButton("-");
         button_minus.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                smallField.setText("-");
+                calculation.setOperand("-");
 
-                calculation.setOperation('-');
+                smallField.setText(calculation.getExprecion());
             }
         });
         constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -120,14 +119,48 @@ public class Window implements ActionListener {
         constraints.gridy = gridy;
         contents.add(button_minus, constraints);
 
+        JButton button_multiply = new JButton("*");
+        button_multiply.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                calculation.setOperand("*");
+
+                smallField.setText(calculation.getExprecion());
+            }
+        });
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.gridx = 2;
+        constraints.gridwidth = 1;
+        constraints.gridy = gridy;
+        contents.add(button_multiply, constraints);
+
+        gridy++;
+
+        JButton button_divide = new JButton("/");
+        button_divide.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                calculation.setOperand("/");
+
+                smallField.setText(calculation.getExprecion());
+            }
+        });
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.gridx = 0;
+        constraints.gridwidth = 1;
+        constraints.gridy = gridy;
+        contents.add(button_divide, constraints);
+
         //=== Результат
         gridy++;
 
         JButton button_result = new JButton("=");
         button_result.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                calculation.calculation();
-                smallField.setText(Calculation.getFloatStr(calculation.getResult()));
+                try {
+                    calculation.calculateExprecion();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+                smallField.setText(calculation.getExprecion());
             }
         });
         constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -139,7 +172,7 @@ public class Window implements ActionListener {
         JButton button_clear = new JButton("c");
         button_clear.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Calculation.singleCalculation();
+                calculation.reset();
                 smallField.setText("");
             }
         });

@@ -9,12 +9,7 @@ import java.util.regex.Pattern;
 
 public class Calculation {
     private static Calculation calculation = null;
-
-    private char operation;
-    private Float operand = null;
-
-    private Float result = null;
-    private String result_str = "";
+    private String exprecion = "";
 
     private Calculation() {
 
@@ -23,90 +18,46 @@ public class Calculation {
     public static Calculation singleCalculation() {
         if (calculation == null) {
             calculation = new Calculation();
-        } else {
-            calculation.operation = '\u0000';
-            calculation.operand = null;
-
-            calculation.result = null;
-            calculation.result_str = "";
         }
 
         return calculation;
     }
 
-    public void setOperation(char operation) {
-        this.operation = operation;
-
-        this.result = this.operand;
-        this.result_str = "";
-
-        operand = null;
+    public void reset() {
+        this.exprecion = "";
     }
 
     public void setOperand(String operand) {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-        symbols.setDecimalSeparator('.');
-        DecimalFormat format = new DecimalFormat("0.#");
-        format.setDecimalFormatSymbols(symbols);
+        String tmp_exprecion = this.exprecion + operand;
+        boolean add_operand = true;
+        Matcher matcher = null;
 
-        if (operand.equals(".")) {
-            if (!this.result_str.contains(".")) {
-                if (this.result_str.equals("")) {
-                    this.result_str += "0.";
-                } else {
-                    this.result_str += ".";
-                }
-            }
-        } else {
-            this.result_str += operand;
+        //=== Проверка точeк
+        matcher = Pattern.compile("(\\.{2})|(\\.(\\d)+\\.)|([^\\d]+\\.)|(^\\.)").matcher(tmp_exprecion);
+        if (matcher.find()) {
+            add_operand = false;
         }
 
-        try {
-            this.operand = format.parse(this.result_str).floatValue();
-        } catch (ParseException e) {
-            e.printStackTrace();
+        //=== Проверка операндов
+        matcher = Pattern.compile("([\\+\\-\\*\\/\\^]{2})|(^[\\+\\*\\/\\^])").matcher(tmp_exprecion);
+        if (matcher.find()) {
+            add_operand = false;
+        }
+
+        if (add_operand) {
+            this.exprecion += operand;
         }
     }
 
-    public float getOperand() {
-        return this.operand;
+    public String getExprecion() {
+        return this.exprecion;
     }
 
-    public String getResultStr() {
-        return this.result_str;
+    public void calculateExprecion() throws Exception {
+        this.exprecion = calculate(this.exprecion);
     }
 
-    public static String getFloatStr(float operand) {
-        String operand_str = String.valueOf(operand);
-
-        if (operand % 1 == 0) {
-            operand_str = String.format("%.0f", operand);
-        }
-
-        return operand_str;
-    }
-
-    public void calculation () {
-        switch (operation) {
-            case '+': result += operand;
-                break;
-            case '-': result -= operand;
-                break;
-        }
-
-        System.out.println(result);
-
-        operand = result;
-        result_str = "";
-    }
-
-    public float getResult() {
-        return this.result;
-    }
-
-    public static void calculate(String exprecion) {
-        System.out.println(exprecion);
-
+    public static String calculate(String exprecion) throws Exception {
         //=== Расскрываем скобки в выражении
             int first_parentheses = exprecion.lastIndexOf('(');
             while (first_parentheses > 0) {
@@ -119,18 +70,19 @@ public class Calculation {
                 first_parentheses = exprecion.lastIndexOf('(');
             }
 
-        exprecion = calculateExp(exprecion).replace("(", "").replace(")", "").replace(" ", "");
-        System.out.println(exprecion);
+        String result = calculateExp(exprecion).replace("(", "").replace(")", "").replace(" ", "");
+
+        return result;
     }
 
     //=== Считаем значение выражения без скобок
-    public static String calculateExp(String exprecion) {
+    public static String calculateExp(String exprecion) throws Exception {
+
         LinkedList<String> patterns = new LinkedList();
-        patterns.add("(^-)?[\\d\\.]+[\\^][\\d\\.]+");
-        patterns.add("(^-)?[\\d\\.]+[\\*][\\d\\.]+");
-        patterns.add("(^-)?[\\d\\.]+[\\/][\\d\\.]+");
-        patterns.add("(^-)?[\\d\\.]+[\\+][\\d\\.]+");
-        patterns.add("(^-)?[\\d\\.]+[-][\\d\\.]+");
+        for(String operation: Operation.getOperationList()) {
+            patterns.add("(^-)?[\\d\\.]+[\\"+operation+"][\\d\\.]+");
+        }
+
         Matcher matcher = null;
         boolean repeat_calculate = true;
 
@@ -152,33 +104,27 @@ public class Calculation {
         return exprecion;
     }
     //=== Считаем значение элементарного выражения
-    public static Double calculateUnitExp(String exprecion) {
+    public static Double calculateUnitExp(String exprecion) throws Exception {
+        //=== Получаем операнды и операцию
         Pattern pattern_digit = Pattern.compile("(^[-]?[\\d\\.]*)|([^\\d\\.])|([\\d\\.]*$)");
-        Matcher matcher = null;
-        matcher = pattern_digit.matcher(exprecion);
-        ArrayList expr_arr = new ArrayList();
-        Double expr_result = 0.0;
+        Matcher matcher = pattern_digit.matcher(exprecion);
+        int i = 0;
+        Double first_operand = null;
+        Double second_operand = null;
+        String operation = null;
         while (matcher.find()) {
-            //System.out.println(matcher.group(0));
-            expr_arr.add(matcher.group(0));
+            if (i == 0) {
+                first_operand = Double.parseDouble(matcher.group(0).toString());
+            }
+            if (i == 1) {
+                operation = matcher.group(0).toString();
+            }
+            if (i == 2) {
+                second_operand = Double.parseDouble(matcher.group(0).toString());
+            }
+            i++;
         }
 
-        if (expr_arr.get(1).equals("^")) {
-            expr_result = Math.pow(Double.parseDouble(expr_arr.get(0).toString()), Double.parseDouble(expr_arr.get(2).toString()));
-        }
-        if (expr_arr.get(1).equals("*")) {
-            expr_result = Double.parseDouble(expr_arr.get(0).toString()) * Double.parseDouble(expr_arr.get(2).toString());
-        }
-        if (expr_arr.get(1).equals("/")) {
-            expr_result = Double.parseDouble(expr_arr.get(0).toString()) / Double.parseDouble(expr_arr.get(2).toString());
-        }
-        if (expr_arr.get(1).equals("+")) {
-            expr_result = Double.parseDouble(expr_arr.get(0).toString()) + Double.parseDouble(expr_arr.get(2).toString());
-        }
-        if (expr_arr.get(1).equals("-")) {
-            expr_result = Double.parseDouble(expr_arr.get(0).toString()) - Double.parseDouble(expr_arr.get(2).toString());
-        }
-
-        return expr_result;
+        return Operation.calculate(first_operand, second_operand, operation);
     }
 }

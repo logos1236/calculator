@@ -27,12 +27,16 @@ public class Calculation {
         this.exprecion = "";
     }
 
+    public void removeLastChar() {
+        if (this.exprecion != null && this.exprecion.length() != 0) {
+            this.exprecion = (this.exprecion.substring(0, this.exprecion.length() - 1));
+        }
+    }
+
     public void setOperand(String operand) {
         String tmp_exprecion = this.exprecion + operand;
 
-        if (Operation.validateExprecion(tmp_exprecion)) {
-            this.exprecion += operand;
-        }
+        this.exprecion += operand;
     }
 
     public String getExprecion() {
@@ -40,6 +44,8 @@ public class Calculation {
     }
 
     public void calculateExprecion() throws Exception {
+        Operation.validateExprecion(this.exprecion);
+
         this.exprecion = calculate(this.exprecion);
     }
 
@@ -48,6 +54,7 @@ public class Calculation {
             int first_parentheses = exprecion.lastIndexOf('(');
             while (first_parentheses > 0) {
                 int last_parentheses = first_parentheses + exprecion.substring(first_parentheses).indexOf(')') + 1;
+
                 String substr = exprecion.substring(first_parentheses, last_parentheses).replace("(", "").replace(")", "").replace(" ", "");
                 String expr_result = calculateExp(substr);
                 exprecion = new StringBuilder(exprecion).replace(first_parentheses, last_parentheses, expr_result.toString()).toString();

@@ -16,7 +16,7 @@ public class Window implements ActionListener {
     private void initComponents() {
         JFrame.setDefaultLookAndFeelDecorated(false);
         viewForm = new JFrame("Калькулятор");
-        viewForm.setSize(320, 320);
+        viewForm.setSize(620, 620);
         viewForm.setLocationRelativeTo(null);
         viewForm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -41,6 +41,22 @@ public class Window implements ActionListener {
         constraints.gridy = gridy;
         constraints.gridwidth = 3;
         contents.add(smallField, constraints);
+
+        gridy++;
+
+        //=== Текстовое поле для ошибок
+        JTextField smallField_error = new JTextField(15);
+        smallField_error.setToolTipText("Ошибки");
+        smallField_error.setEditable(false);
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.gridx = 0;
+        constraints.gridy = gridy;
+        constraints.gridwidth = 3;
+        contents.add(smallField_error, constraints);
+
+        viewForm.getContentPane().add(contents);
+        viewForm.pack();
+        viewForm.setVisible(true);
 
         //=== Кнопки - цифры
         gridy++;
@@ -149,16 +165,47 @@ public class Window implements ActionListener {
         constraints.gridy = gridy;
         contents.add(button_divide, constraints);
 
+        JButton button_bracket_1 = new JButton("(");
+        button_bracket_1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                calculation.setOperand("(");
+
+                smallField.setText(calculation.getExprecion());
+            }
+        });
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.gridx = 1;
+        constraints.gridwidth = 1;
+        constraints.gridy = gridy;
+        contents.add(button_bracket_1, constraints);
+
+        JButton button_bracket_2 = new JButton(")");
+        button_bracket_2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                calculation.setOperand(")");
+
+                smallField.setText(calculation.getExprecion());
+            }
+        });
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.gridx = 2;
+        constraints.gridwidth = 1;
+        constraints.gridy = gridy;
+        contents.add(button_bracket_2, constraints);
+
         //=== Результат
         gridy++;
 
         JButton button_result = new JButton("=");
         button_result.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                smallField_error.setText("");
+
                 try {
                     calculation.calculateExprecion();
                 } catch (Exception e1) {
                     e1.printStackTrace();
+                    smallField_error.setText(e1.getMessage());
                 }
                 smallField.setText(calculation.getExprecion());
             }
@@ -169,21 +216,30 @@ public class Window implements ActionListener {
         contents.add(button_result, constraints);
 
         //=== Очистить
-        JButton button_clear = new JButton("c");
-        button_clear.addActionListener(new ActionListener() {
+        JButton button_clear_all = new JButton("c");
+        button_clear_all.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 calculation.reset();
-                smallField.setText("");
+                smallField.setText(calculation.getExprecion());
             }
         });
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 1;
         constraints.gridy = gridy;
-        contents.add(button_clear, constraints);
+        contents.add(button_clear_all, constraints);
 
-        viewForm.getContentPane().add(contents);
-        viewForm.pack();
-        viewForm.setVisible(true);
+        //=== Очистить
+        JButton button_clear_symbol = new JButton("\t←");
+        button_clear_symbol.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                calculation.removeLastChar();
+                smallField.setText(calculation.getExprecion());
+            }
+        });
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.gridx = 2;
+        constraints.gridy = gridy;
+        contents.add(button_clear_symbol, constraints);
     }
 
     @Override

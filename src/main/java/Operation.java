@@ -42,20 +42,44 @@ public class Operation {
         return result;
     }
 
-    public static boolean validateExprecion(String exprecion) {
+    public static boolean validateExprecion(String exprecion) throws Exception {
+        String result_str = null;
         boolean result = true;
         Matcher matcher = null;
 
         //=== Проверка точeк
         matcher = Pattern.compile("(\\.{2})|(\\.(\\d)+\\.)|([^\\d]+\\.)|(^\\.)").matcher(exprecion);
         if (matcher.find()) {
+            result_str = "Неверно расставлены точки";
             result = false;
         }
 
         //=== Проверка операндов
         matcher = Pattern.compile("([\\+\\-\\*\\/\\^]{2})|(^[\\+\\*\\/\\^])").matcher(exprecion);
         if (matcher.find()) {
+            result_str = "Неверно расставлены операнды";
             result = false;
+        }
+
+        //=== Проверка скобок
+        int first_parentheses = -1;
+        int last_parentheses = -1;
+        first_parentheses = exprecion.lastIndexOf('(');
+        last_parentheses = exprecion.lastIndexOf(')');
+
+        if (last_parentheses == 0) {
+            result = false;
+            result_str = "Неверно расставлены скобки";
+        }
+        if ((last_parentheses > 0) && (last_parentheses < first_parentheses)) {
+            result = false;
+            result_str = "Неверно расставлены скобки";
+        }
+        System.out.println("first_parentheses "+first_parentheses);
+        System.out.println("last_parentheses "+last_parentheses);
+
+        if (!result) {
+            throw new Exception(result_str);
         }
 
         return result;

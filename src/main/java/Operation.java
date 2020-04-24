@@ -67,16 +67,25 @@ public class Operation {
         first_parentheses = exprecion.lastIndexOf('(');
         last_parentheses = exprecion.lastIndexOf(')');
 
+        //=== Закрывающая скобка первым символом
         if (last_parentheses == 0) {
             result = false;
             result_str = "Неверно расставлены скобки";
         }
+
+        //=== Количествот коткрывающих и закрывающих скобок
         if ((last_parentheses > 0) && (last_parentheses < first_parentheses)) {
             result = false;
             result_str = "Неверно расставлены скобки";
         }
-        System.out.println("first_parentheses "+first_parentheses);
-        System.out.println("last_parentheses "+last_parentheses);
+
+        //=== Количество открывающих и закрывающих скобок
+        int first_parentheses_count = exprecion.replaceAll("[\\(]", "").length();
+        int last_parentheses_count = exprecion.replaceAll("[\\)]", "").length();
+        if (first_parentheses_count != last_parentheses_count) {
+            result = false;
+            result_str = "Неверно расставлены скобки";
+        }
 
         if (!result) {
             throw new Exception(result_str);

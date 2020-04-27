@@ -54,10 +54,6 @@ public class Window implements ActionListener {
         constraints.gridwidth = 3;
         contents.add(smallField_error, constraints);
 
-        viewForm.getContentPane().add(contents);
-        viewForm.pack();
-        viewForm.setVisible(true);
-
         //=== Кнопки - цифры
         gridy++;
 
@@ -240,6 +236,10 @@ public class Window implements ActionListener {
         constraints.gridx = 2;
         constraints.gridy = gridy;
         contents.add(button_clear_symbol, constraints);
+
+        viewForm.getContentPane().add(contents);
+        viewForm.pack();
+        viewForm.setVisible(true);
     }
 
     @Override
